@@ -1,13 +1,9 @@
-
-<!--// 🔥 KLART: byt till din Worker URL
-const API = "https://bitter-lab-3d97.staffan-420.workers.dev";-->
-
-
 <!DOCTYPE html>
 <html lang="sv">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Avgångstavla</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -16,8 +12,15 @@ const API = "https://bitter-lab-3d97.staffan-420.workers.dev";-->
 :root{
   --bg:#000;
   --text:#FFD600;
-  --metro:#D71920;   /* SL röd */
-  --bus:#1E88E5;     /* SL blå-ish */
+  --border:#FFD600;
+  --metro:#D71920;
+  --bus:#1E88E5;
+}
+
+body.light{
+  --bg:#f5f5f5;
+  --text:#111;
+  --border:#111;
 }
 
 body{
@@ -27,82 +30,81 @@ body{
   font-family:'Roboto Mono', monospace;
 }
 
-/* HEADER BAR (som SL) */
-.topbar{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 20px;
-  border-bottom:2px solid var(--text);
-  font-size:18px;
-}
-
-.clock{
-  opacity:0.9;
-}
-
-/* BOARD */
 .board{
   max-width:800px;
-  margin:auto;
+  margin:20px auto;
   padding:20px;
+  border:3px solid var(--border);
+  border-radius:20px;
 }
 
 .section{
-  margin-bottom:50px;
+  margin-bottom:40px;
 }
 
-/* TITLAR */
-.title{
-  font-size:26px;
+.title-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid var(--border);
+  margin-bottom:6px;
+}
+
+.title, .clock{
+  font-size:22px;
   font-weight:600;
-  margin-bottom:10px;
-  border-bottom:3px solid var(--text);
-  padding-bottom:5px;
-  letter-spacing:1px;
 }
 
-/* GRID */
 .columns{
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:30px;
+  gap:25px;
 }
 
 .sub{
-  font-size:14px;
-  opacity:0.8;
-  margin-bottom:8px;
+  font-size:13px;
+  margin-bottom:6px;
+  text-transform:uppercase;
 }
 
-/* ROW */
 .row{
   display:grid;
-  grid-template-columns:60px 1fr 60px;
+  grid-template-columns:50px 1fr 80px;
   align-items:center;
-  font-size:20px;
-  padding:5px 0;
+  padding:2px 0;
 }
 
-/* BADGES */
-.badge{
-  display:inline-block;
-  padding:4px 6px;
-  border-radius:4px;
-  color:#fff;
+.dest{
+  font-size:15px;
+}
+
+.time{
+  display:flex;
+  justify-content:flex-end;
+  align-items:baseline;
+  gap:6px;
+  font-size:20px;
   font-weight:600;
+}
+
+.clock-small{
+  font-size:12px;
+  opacity:0.6;
+  min-width:45px;
+  text-align:right;
+}
+
+.badge{
+  padding:3px 5px;
+  border-radius:3px;
+  color:#fff;
+  font-size:14px;
   text-align:center;
 }
 
 .metro{ background:var(--metro); }
 .bus{ background:var(--bus); }
 
-/* TIME */
-.time{
-  text-align:right;
-}
-
-/* BLINK */
 .now{
   animation:blink 1s infinite;
 }
@@ -110,108 +112,232 @@ body{
   50%{opacity:0;}
 }
 
-/* FULLSCREEN */
-.fullscreen-btn{
-  position:fixed;
-  bottom:10px;
-  right:10px;
-  background:#222;
-  color:#fff;
-  border:none;
-  padding:8px 12px;
-  cursor:pointer;
+.clock{
+  display:flex;
+  align-items:baseline;
+  gap:2px; /* 🔥 justera detta */
+  letter-spacing: -1px; /* tajtar ytterligare */
+  font-variant-numeric: tabular-nums;
 }
+
+.colon{
+  animation: blink 1s steps(1) infinite;
+  margin: 0 -1px; /* drar ihop ännu mer */
+}
+
+@keyframes blink{
+  50% { opacity: 0; }
+}
+
+#clock-hours,
+#clock-minutes {
+  min-width: 28px;
+  text-align: right;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="topbar">
-  <div>AVGÅNGAR</div>
-  <div class="clock" id="clock"></div>
-</div>
-
 <div class="board">
 
   <!-- 🚇 -->
   <div class="section">
-    <div class="title">TUNNELBANA GÄRDET</div>
-
+    <div class="title-row">
+      <div class="title">TUNNELBANA GÄRDET</div>
+      <div class="clock">
+        <span id="clock-hours"></span>
+        <span class="colon">:</span>
+        <span id="clock-minutes"></span>
+      </div>
+    </div>
     <div class="columns">
-      <div>
-        <div class="sub">Mot Ropsten</div>
-        <div id="metro-ropsten"></div>
-      </div>
-
-      <div>
-        <div class="sub">Mot Norsborg</div>
-        <div id="metro-norsborg"></div>
-      </div>
+      <div id="metro-left"></div>
+      <div id="metro-right"></div>
     </div>
   </div>
 
-  <!-- 🚌 -->
+  <!-- 🚌 76 -->
   <div class="section">
-    <div class="title">BUSS 76 hpl Malmvägen</div>
-
+    <div class="title-row">
+      <div class="title">BUSS 76 hpl Malmvägen</div>
+    </div>
     <div class="columns">
-      <div>
-        <div class="sub">Mot Ropsten</div>
-        <div id="bus-ropsten"></div>
-      </div>
+      <div id="bus76-left"></div>
+      <div id="bus76-right"></div>
+    </div>
+  </div>
 
-      <div>
-        <div class="sub">Mot Norra Hammarbyhamnen</div>
-        <div id="bus-hammarby"></div>
-      </div>
+  <!-- 🚌 1 -->
+  <div class="section">
+    <div class="title-row">
+      <div class="title">BUSS 1 hpl Gärdet</div>
+    </div>
+    <div class="columns">
+      <div id="bus1-left"></div>
+      <div id="bus1-right"></div>
     </div>
   </div>
 
 </div>
 
-<button class="fullscreen-btn" onclick="goFull()">⛶</button>
-
 <script>
-// 🔥 BYT till din Worker
 const API = "https://bitter-lab-3d97.staffan-420.workers.dev";
+
+/* THEME */
+const params = new URLSearchParams(location.search);
+if(params.get("theme")==="light") document.body.classList.add("light");
+
+document.addEventListener("keydown", e=>{
+  if(e.key.toLowerCase()==="o") document.body.classList.toggle("light");
+});
 
 /* CLOCK */
 function updateClock(){
   const now = new Date();
-  document.getElementById("clock").innerText =
-    now.toLocaleTimeString("sv-SE", {hour:"2-digit", minute:"2-digit"});
+
+  const h = String(now.getHours()).padStart(2, "0");
+  const m = String(now.getMinutes()).padStart(2, "0");
+
+  document.getElementById("clock-hours").innerText = h;
+  document.getElementById("clock-minutes").innerText = m;
 }
-setInterval(updateClock, 1000);
+setInterval(updateClock,1000);
 updateClock();
 
-/* TIME FORMAT */
-function formatTime(t){
-  if(!t) return "";
-  if(t.toLowerCase().includes("nu")) return '<span class="now">Nu</span>';
-  return t.replace(" min","");
+/* GET MINUTES */
+function getMinutes(t){
+  if(!t) return 999;
+  t=t.toLowerCase();
+
+  if(t.includes("nu")) return 0;
+  if(t.includes("min")) return parseInt(t);
+
+  if(t.includes(":")){
+    const now=new Date();
+    const [h,m]=t.split(":").map(Number);
+    const dep=new Date();
+    dep.setHours(h,m,0,0);
+
+    let diff=(dep-now)/60000;
+    if(diff<0) diff+=1440;
+    return diff;
+  }
+  return 999;
+}
+
+/* GET CLOCK TIME */
+function getClockTime(d){
+  // 🔥 testa alla vanliga fält
+  const possible =
+    d.expectedDateTime ||
+    d.scheduledDateTime ||
+    d.estimatedDateTime ||
+    d.aimedDepartureTime ||
+    d.time;
+
+  if(possible){
+    const date = new Date(possible);
+    if(!isNaN(date)){
+      return date.toLocaleTimeString("sv-SE", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+  }
+
+  // fallback: om display råkar vara HH:MM
+  if(d.display && d.display.includes(":")){
+    return d.display;
+  }
+
+  return "";
+}
+
+/* FORMAT TIME */
+function formatTime(d){
+  const t = d.display || "";
+  const minutes = getMinutes(t);
+
+  // Nu
+  if(t.toLowerCase().includes("nu")){
+    return `<span class="now">Nu</span>`;
+  }
+
+  // minuter finns
+  if(t.includes("min")){
+    if(minutes < 10){
+      return `<span>${minutes}</span>`;
+    }
+
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + minutes);
+
+    const clock = now.toLocaleTimeString("sv-SE", {
+      hour: "2-digit",
+      minute: "2-digit"
+    });
+
+    return `
+      <span class="clock-small">${clock}</span>
+      <span>${minutes}</span>
+    `;
+  }
+
+  // 🔥 ENDAST klockslag → samma stil som minuter
+  if(t.includes(":")){
+    return `<span>${t}</span>`;
+  }
+
+  return "";
+}
+
+/* GROUP */
+function groupByDirection(list, line){
+  const filtered = list.filter(x => x.line?.designation == line);
+
+  const groups = {};
+  filtered.forEach(d=>{
+    const key = d.destination || "okänd";
+    if(!groups[key]) groups[key]=[];
+    groups[key].push(d);
+  });
+
+  return Object.values(groups)
+    .map(g => g.sort((a,b)=>getMinutes(a.display)-getMinutes(b.display)))
+    .sort((a,b)=>getMinutes(a[0].display)-getMinutes(b[0].display))
+    .slice(0,2);
 }
 
 /* RENDER */
-function renderColumn(list, containerId, filterFn, type){
-  const el = document.getElementById(containerId);
-  el.innerHTML = "";
+function renderGrouped(list, leftId, rightId, line, type){
+  const groups = groupByDirection(list, line);
 
-  list
-    .filter(filterFn)
-    .slice(0,5)
-    .forEach(d=>{
-      const line = d.line?.designation || "";
-      const dest = "Mot " + (d.destination || "");
-      const time = d.display || "";
+  const left = document.getElementById(leftId);
+  const right = document.getElementById(rightId);
 
-      el.innerHTML += `
+  left.innerHTML="";
+  right.innerHTML="";
+
+  [left,right].forEach((col,i)=>{
+    const g = groups[i];
+    if(!g) return;
+
+    const dest = g[0].destination;
+
+    col.innerHTML += `<div class="sub">Mot ${dest}</div>`;
+
+    g.slice(0,5).forEach(d=>{
+      col.innerHTML += `
         <div class="row">
-          <div><span class="badge ${type}">${line}</span></div>
-          <div>${dest}</div>
-          <div class="time">${formatTime(time)}</div>
+          <div><span class="badge ${type}">${d.line.designation}</span></div>
+          <div class="dest">${dest}</div>
+          <div class="time">${formatTime(d)}</div>
         </div>
       `;
     });
+  });
 }
 
 /* LOAD */
@@ -219,32 +345,13 @@ async function load(){
   const res = await fetch(API);
   const data = await res.json();
 
-  // 🚇
-  renderColumn(data.metro,"metro-ropsten",
-    x=>x.line?.designation=="13" && x.destination.includes("Ropsten"),
-    "metro");
-
-  renderColumn(data.metro,"metro-norsborg",
-    x=>x.line?.designation=="13" && x.destination.includes("Norsborg"),
-    "metro");
-
-  // 🚌
-  renderColumn(data.bus,"bus-ropsten",
-    x=>x.line?.designation=="76" && x.destination.includes("Ropsten"),
-    "bus");
-
-  renderColumn(data.bus,"bus-hammarby",
-    x=>x.line?.designation=="76" && x.destination.includes("Hammarby"),
-    "bus");
+  renderGrouped(data.metro,"metro-left","metro-right","13","metro");
+  renderGrouped(data.bus76,"bus76-left","bus76-right","76","bus");
+  renderGrouped(data.bus1,"bus1-left","bus1-right","1","bus");
 }
 
 load();
 setInterval(load,30000);
-
-/* FULLSCREEN */
-function goFull(){
-  document.documentElement.requestFullscreen();
-}
 </script>
 
 </body>
